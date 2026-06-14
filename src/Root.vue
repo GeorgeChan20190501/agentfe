@@ -2,8 +2,6 @@
   <router-view />
 </template>
 
-<script setup lang="ts"></script>
-
 <style>
   * {
     margin: 0;

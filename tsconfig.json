@@ -3,5 +3,13 @@
   "references": [
     { "path": "./tsconfig.app.json" },
     { "path": "./tsconfig.node.json" }
-  ]
+  ],
+
+  "配置说明": {
+    "tsconfig.json":"根配置文件,实现配置分离,作为入口文件，通过 references 引用其他配置",
+    "tsconfig.app.json":"Vue应用TS配置,约束 src 目录下的 TS 语法检查规则",
+    "tsconfig.node.jso":"Node/Vite应用配置,用于 Vite 配置文件、构建脚本等 Node 环境代码",
+
+    "主要配置内":" 检查范围 | 编译选项 | 类型查找 | 严格程度 | 输出位置"
+  }
 }

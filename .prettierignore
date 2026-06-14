@@ -6,3 +6,40 @@ dist-ssr
 .idea
 package-lock.json
 pnpm-lock.yaml
+
+# 覆盖率报告
+coverage
+
+# 日志文件
+*.log
+
+# 环境变量文件（可选，根据团队习惯）
+# .env.local
+# .env.*.local
+
+
+# 配置文件说明
+# .prettierignore文件规定哪些文件不格式化（类似 .gitignore)
+# .prettierrc.js文件规定格式化规则,规则如下：
+
+#{
+#  "semi": false,                   // 不使用分号
+#  "singleQuote": true,             // 使用单引号
+#  "tabWidth": 2,                   // 缩进2空格
+#  "trailingComma": "none",         // 不要尾随逗号
+#  "printWidth": 100,               // 每行最大100字符
+#  "arrowParens": "always",         // 箭头函数参数总是加括号 (x) => x
+#  "endOfLine": "auto",             // 自动检测换行符
+#  "vueIndentScriptAndStyle": true  // Vue 文件中 script/style 缩进
+#}
+
+# 他们相互协作，过程如下：
+#    运行 npm run format
+#           ↓
+#    读取 .prettierrc.json（格式化规则）
+#           ↓
+#    检查 .prettierignore（排除文件）
+#           ↓
+#    格式化剩余文件
+#           ↓
+#    保存修改后的代码

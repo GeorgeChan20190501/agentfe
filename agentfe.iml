@@ -6,3 +6,9 @@
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
 </module>
+
+<!-- agentfe.iml 是IDEA自动生成的模块配置文件，用于记录该前端项目在 IDE 中的结构信息（如源码目录、依赖关系等）。
+处理建议：
+保留在本地：确保 IDE 能正确识别项目结构。
+不提交到 Git
+-->

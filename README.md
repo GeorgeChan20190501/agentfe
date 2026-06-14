@@ -93,7 +93,7 @@ my-vue3/ <br/>
 │ ├── hooks/ # 组合式函数（业务逻辑）<br/>
 │ │ └── useLogin.ts # 登录逻辑<br/>
 │ ├── router/ # 路由配置<br/>
-│ │ └── index.ts # 路由定义 + 守卫<br/>
+│ │ └── router.ts # 路由定义 + 守卫<br/>
 │ ├── stores/ # Pinia 状态管理<br/>
 │ │ └── user.ts # 用户状态 <br/>
 │ ├── utils/ # 工具函数<br/>

@@ -7,7 +7,16 @@
     <title>agentfe</title>
   </head>
   <body>
-    <div id="app"></div>
+    <!-- Vue 应用挂载点，与 main.ts 中的 app.mount('#ap1') 对应 -->
+    <div id="app1"></div>
+    
+    <!-- 
+      Vite 入口文件：使用 ES Module 方式加载
+      与 Vue2 + Webpack 的区别：
+      - Vue2: 通常在 main.js 中通过 new Vue() 创建实例
+      - Vue3 + Vite: 使用 type="module" 支持原生 ES Module，无需打包工具注入
+      - Vite 在开发时直接提供原生 ESM，生产构建时才进行优化打包
+    -->
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>
