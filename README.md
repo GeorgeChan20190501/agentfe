@@ -1,14 +1,14 @@
 NEW_FILE_CODE
 # My Vue3 - 现代化前端项目模板
 
-![CI/CD](https://github.com/GeorgeChan20190501/my-vue3/actions/workflows/ci-cd.yml/badge.svg)
+![CI/CD](https://github.com/GeorgeChan20190501/agentfe/actions/workflows/ci-cd.yml/badge.svg)
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 ![Vue](https://img.shields.io/badge/Vue-3.5-green.svg)
-![TypeScript](https://img.shields.io/badge/TypeScript-5.5-blue.svg)
+![TypeScript](https://img.shields.io/badge/TypeScript-6.0-blue.svg)
 
 一个基于 **Vue 3 + TypeScript + Vite** 的现代化前端项目模板，具备完整的工程化配置和自动化部署能力。
 
-**在线预览**: http://122.51.82.232
+**在线预览**: http://122.51.82.232:7090
 
 ---
 
@@ -16,8 +16,8 @@ NEW_FILE_CODE
 
 ### 🏗️ 技术栈
 - **Vue 3.5** - 渐进式 JavaScript 框架（Composition API + `<script setup>`）
-- **TypeScript 5.5** - 类型安全的 JavaScript 超集
-- **Vite 5** - 极速的前端构建工具
+- **TypeScript 6.0** - 类型安全的 JavaScript 超集
+- **Vite 8** - 极速的前端构建工具
 - **Pinia 3** - Vue 官方推荐的状态管理库
 - **Vue Router 4** - 官方路由管理器
 - **Axios** - 基于 Promise 的 HTTP 客户端
@@ -42,8 +42,8 @@ NEW_FILE_CODE
 ## 📦 快速开始
 
 ### 前置要求
-- Node.js >= 20.0.0
-- npm >= 10.0.0
+- Node.js >= 24.0.0
+- npm >= 11.0.0
 
 ### 安装依赖
 ```bash 
@@ -83,34 +83,41 @@ npm run build
 ## 📁 项目结构
 
 my-vue3/ <br/>
-├── .github/workflows/   #GitHub Actions CI/CD 配置<br/>
-├── public/ # 静态资源 <br/>
+├── .github/workflows/     ===》`#GitHub Actions CI/CD 配置`<br/>
+├── public/ ============》 静态资源 <br/>
 ├── src/ <br/>
-│ ├── api/ # API 接口层<br/>
-│ │ └── user.ts # 用户相关接口<br/>
-│ ├── assets/ # 资源文件（图片、字体等）<br/>
-│ ├── components/ # 公共组件 <br/>
-│ ├── hooks/ # 组合式函数（业务逻辑）<br/>
-│ │ └── useLogin.ts # 登录逻辑<br/>
-│ ├── router/ # 路由配置<br/>
-│ │ └── router.ts # 路由定义 + 守卫<br/>
-│ ├── stores/ # Pinia 状态管理<br/>
-│ │ └── user.ts # 用户状态 <br/>
-│ ├── utils/ # 工具函数<br/>
-│ │ └── request.ts # Axios 封装<br/>
-│ ├── views/ # 页面组件<br/>
-│ │ ├── Login.vue # 登录页 <br/>
-│ │ ├── Home.vue # 首页<br/>
-│ │ └── About.vue # 关于页<br/>
-│ ├── App.vue # 根组件 <br/>
-│ └── main.ts # 入口文件<br/>
-├── .env # 通用环境变量 <br/>
-├── .env.development # 开发环境配置<br/>
-├── .env.production # 生产环境配置<br/>
-├── vite.config.ts # Vite 配置<br/>
-├── tsconfig.json # TypeScript 配置 <br/>
-├── package.json # 项目依赖<br/>
-└── README.md # 项目说明
+│ ├── api/ ============》# API 接口层,发起http请求<br/>
+│ │ └── user.ts  <br/>
+│ ├── assets/ =========》# 资源文件（图片、字体等）<br/>
+│ ├── components/ =====》# UI组件，封装html片段 <br/>
+│ ├── hooks/ ==========》# 组合式函数（业务逻辑）<br/>
+│ │ └── useLogin.ts  <br/>
+│ ├── router/ =========》# 路由配置<br/>
+│ │ └── router.ts ======》# 路由定义 + 守卫<br/>
+│ ├── stores/ =========》# Pinia 状态管理<br/>
+│ │ └── user.ts  <br/>
+│ ├── utils/ ===========》# 工具函数<br/>
+│ │ └── request.ts =====》# Axios 封装<br/>
+│ ├── views/ ==========》# 页面组件<br/>
+│ │ ├── Login.vue  <br/>
+│ │ ├── Home.vue  <br/>
+│ │ └── About.vue <br/>
+│ ├── App.vue ============》# 根组件 <br/>
+│ └── main.ts ============》# 入口文件<br/>
+├── .env  ================》# 通用环境变量 <br/>
+├── .env.development ======》# 开发环境配置<br/>
+├── .env.production ========》# 生产环境配置<br/>
+├── .eslintrc.cjs ===========》# 配置ESLint 代码质量检查工具<br/>
+├── .prettierignore =========》# 格式化忽略文件配置<br/>
+├── .prettierrc.json =========》# 格式化配置文件<br/>
+├── tsconfig.json ==========》# TypeScript 配置 <br/>
+├── tsconfig.app.json =======》# Vue应用TS配置 <br/>
+├── tsconfig.node.json ======》# Node/vite应用TS配置 <br/>
+├── package.json ==========》# 项目核心依赖<br/>
+├── package-lock.json ======》# 项目依赖的具体依赖树<br/>
+├── vite.config.ts ==========》# Vite 配置<br/>
+└── README.md =========》# 项目说明 <br/>
+
 # 项目说明
 ---
 
