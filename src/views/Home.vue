@@ -132,7 +132,7 @@
       <!-- 内容展示区 -->
       <main class="content-area">
         <!-- 首页 - 卡片导航 -->
-        <div v-if="currentPage === 'home'" class="home-page">
+        <div v-if="currentPage === 'home' && !showChatArea" class="home-page">
           <div class="welcome-section">
             <div style="position: relative;top:5px; margin-right: 20px"><img src="@/assets/home/imgs/img8.png" alt="机器人" class="welcome-avatar"></div>
             <div class="welcome-avatar-shadow">
@@ -163,6 +163,30 @@
                 <img :src="scene.image" :alt="scene.name" class="card-image">
               </div>
             </el-card>
+          </div>
+        </div>
+
+        <!-- AI对话输出区域 -->
+        <div v-if="showChatArea" class="chat-container">
+          <div class="chat-messages" ref="chatMessagesRef">
+            <!-- 对话消息列表 -->
+            <div v-for="(message, index) in chatHistory" :key="index" class="message-item">
+              <!-- 用户消息 -->
+              <div v-if="message.role === 'user'" class="message user-message">
+                <div class="message-content">{{ message.content }}</div>
+                <div class="message-avatar user-avatar">
+                  <el-icon><User /></el-icon>
+                </div>
+              </div>
+              
+              <!-- AI回复 -->
+              <div v-else class="message ai-message">
+                <div class="message-avatar ai-avatar">
+                  <img src="@/assets/home/imgs/img8.png" alt="AI" />
+                </div>
+                <div class="message-content markdown-body" v-html="renderMarkdown(message.content)"></div>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -261,7 +285,7 @@
         </div>
 
         <!-- 场景对话页面 -->
-        <div v-else-if="currentPage === 'scene'" class="scene-page">
+        <div v-else-if="currentPage === 'scene' && !showChatArea" class="scene-page">
           <div class="welcome-section">
             <div style="position: relative;top:5px; margin-right: 20px"><img src="@/assets/home/imgs/img8.png" alt="机器人" class="welcome-avatar"></div>
             <div class="welcome-avatar-shadow">
@@ -438,7 +462,8 @@ import {
   DocumentCopy,
   Files
 } from '@element-plus/icons-vue'
-import {sendAiMessage} from "@/api/message.ts";
+import {sendAiMessage, sendAiMessageStream} from "@/api/message.ts";
+import MarkdownIt from 'markdown-it';
 
 export default {
   name: 'Home',
@@ -549,6 +574,12 @@ export default {
         { id: 4, title: '历史对话记录2', time: '2024.10.10 10:00:00', avatar: '历' },
         { id: 5, title: '历史对话记录1', time: '2024.10.10 10:00:00', avatar: '历' },
       ],
+
+      // 聊天历史记录
+      chatHistory: [],
+      
+      // 是否显示聊天区域
+      showChatArea: false,
 
       // 场景卡片配置
       sceneCards: [
@@ -691,6 +722,8 @@ export default {
       this.activeMenu = 'home';
       this.userInput = '';
       this.showAtPanel = false;
+      this.chatHistory = []; // 清空聊天记录
+      this.showChatArea = false; // 隐藏聊天区域
       this.$message.success('已创建新对话');
     },
 
@@ -775,14 +808,59 @@ export default {
         this.$message.warning('请输入内容');
         return;
       }
+      
+      // 显示聊天区域
+      this.showChatArea = true;
+      
+      // 添加用户消息到历史记录
+      const userMessage = {
+        role: 'user',
+        content: this.userInput,
+        timestamp: new Date()
+      };
+      this.chatHistory.push(userMessage);
+      
+      // 创建空的AI回复消息并添加到历史记录
+      const aiMessageIndex = this.chatHistory.length;
+      this.chatHistory.push({
+        role: 'assistant',
+        content: '',
+        timestamp: new Date()
+      });
+      
+      // 滚动到底部
+      this.$nextTick(() => {
+        this.scrollToBottom();
+      });
+      
       this.$message.success('消息已发送，语义识别匹配场景中...');
 
-      const {code,msg, data} = await sendAiMessage(this.userInput)
-
-      console.log(code,msg, data)
+      try {
+        // 使用流式输出
+        await sendAiMessageStream(this.userInput, (chunk) => {
+          // 实时更新AI回复内容 - 通过数组索引直接修改
+          this.chatHistory[aiMessageIndex].content += chunk;
+          console.log('[Vue] 更新AI内容:', this.chatHistory[aiMessageIndex].content.substring(0, 50));
+          // 每次更新后滚动到底部
+          this.$nextTick(() => {
+            this.scrollToBottom();
+          });
+        });
+      } catch (error) {
+        console.error('发送消息失败:', error);
+        this.chatHistory[aiMessageIndex].content = '抱歉，服务暂时不可用，请稍后重试';
+      }
 
       this.userInput = '';
       this.showAtPanel = false;
+    },
+    
+    // 滚动到底部
+    scrollToBottom() {
+      const container = this.$refs.chatMessagesRef;
+      if (container) {
+        container.scrollTop = container.scrollHeight;
+      }
     },
 
     // 键盘事件
@@ -885,6 +963,27 @@ export default {
     // 打开审批进度
     openApprovalDialog() {
       this.showApprovalDialog = true;
+    },
+
+    // 渲染 Markdown 内容
+    renderMarkdown(content) {
+      if (!content) return '';
+      try {
+        const md = new MarkdownIt({
+          html: true,
+          linkify: true,
+          typographer: true,
+          breaks: false
+        });
+        
+        // 轻量预处理：在数字序号前添加换行（如果前面有文字）
+        let processedContent = content.replace(/([^\n])(\d+\.\s)/g, '$1\n$2');
+        
+        return md.render(processedContent);
+      } catch (e) {
+        console.error('Markdown 解析错误:', e);
+        return content;
+      }
     }
   },
 
@@ -1091,6 +1190,104 @@ export default {
   flex: 1;
   overflow-y: auto;
   padding: 24px;
+}
+
+/* AI对话容器 */
+.chat-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 对话消息区域 */
+.chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px 0;
+  min-height: 400px;
+}
+
+.message-item {
+  margin-bottom: 20px;
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.message {
+  display: flex;
+  gap: 12px;
+  max-width: 80%;
+}
+
+.user-message {
+  margin-left: auto;
+  flex-direction: row-reverse;
+}
+
+.ai-message {
+  margin-right: auto;
+}
+
+.message-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 20px;
+}
+
+.user-avatar {
+  background: linear-gradient(135deg, #7C5CFC 0%, #A855F7 100%);
+  color: #fff;
+}
+
+.ai-avatar {
+  background: #f5f7fa;
+  overflow: hidden;
+}
+
+.ai-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.message-content {
+  padding: 12px 16px;
+  border-radius: 12px;
+  font-size: 14px;
+  line-height: 1.6;
+  word-wrap: break-word;
+  white-space: pre-wrap;
+}
+
+.user-message .message-content {
+  background: linear-gradient(135deg, #7C5CFC 0%, #A855F7 100%);
+  color: #fff;
+  border-top-right-radius: 4px;
+}
+
+.ai-message .message-content {
+  background: #fff;
+  color: #333;
+  border: 1px solid #e8e8e8;
+  border-top-left-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 /* 首页 */
@@ -1726,5 +1923,99 @@ export default {
   .search-input {
     width: 100%;
   }
+}
+
+/* Markdown 样式 */
+.markdown-body {
+  line-height: 1.6;
+  word-wrap: break-word;
+}
+
+.markdown-body p {
+  margin: 0 0 1em 0;
+}
+
+.markdown-body p:last-child {
+  margin-bottom: 0;
+}
+
+.markdown-body h1,
+.markdown-body h2,
+.markdown-body h3,
+.markdown-body h4,
+.markdown-body h5,
+.markdown-body h6 {
+  margin-top: 1em;
+  margin-bottom: 0.5em;
+  font-weight: bold;
+}
+
+.markdown-body h1 { font-size: 1.5em; }
+.markdown-body h2 { font-size: 1.3em; }
+.markdown-body h3 { font-size: 1.1em; }
+
+.markdown-body ul,
+.markdown-body ol {
+  margin: 0.5em 0;
+  padding-left: 2em;
+}
+
+.markdown-body li {
+  margin: 0.25em 0;
+}
+
+.markdown-body code {
+  background-color: #f5f5f5;
+  padding: 0.2em 0.4em;
+  border-radius: 3px;
+  font-family: 'Courier New', monospace;
+  font-size: 0.9em;
+}
+
+.markdown-body pre {
+  background-color: #f5f5f5;
+  padding: 1em;
+  border-radius: 5px;
+  overflow-x: auto;
+  margin: 1em 0;
+}
+
+.markdown-body pre code {
+  background-color: transparent;
+  padding: 0;
+}
+
+.markdown-body blockquote {
+  border-left: 4px solid #7C5CFC;
+  padding-left: 1em;
+  margin: 1em 0;
+  color: #666;
+}
+
+.markdown-body a {
+  color: #7C5CFC;
+  text-decoration: none;
+}
+
+.markdown-body a:hover {
+  text-decoration: underline;
+}
+
+.markdown-body table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 1em 0;
+}
+
+.markdown-body th,
+.markdown-body td {
+  border: 1px solid #ddd;
+  padding: 0.5em;
+  text-align: left;
+}
+
+.markdown-body th {
+  background-color: #f5f5f5;
+  font-weight: bold;
 }
 </style>

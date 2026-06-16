@@ -17,8 +17,10 @@
   },
   "dependencies": {
     "@element-plus/icons-vue": "^2.3.2",
+    "@types/markdown-it": "^14.1.2",
     "axios": "^1.17.0",
     "element-plus": "^2.14.2",
+    "markdown-it": "^14.2.0",
     "pinia": "^3.0.4",
     "vue": "^3.5.34",
     "vue-router": "^4.6.4"
@@ -42,18 +44,15 @@
     "vitest": "^4.1.8",
     "vue-tsc": "^3.2.8"
   },
-
   "文件说明": {
     "package.json": "是 Node.js 和 Vue 项目的核心配置文件,这个文件对于项目的初始化（npm install）和日常开发至关重要。",
     "项目基本信息": "如 name（项目名称）、version（版本号）、type（模块类型，这里是 ES）。脚本命令 (Scripts)",
     "常用的操作指令": "例如：dev: 启动开发服务器。 build: 打包生产环境代码。lint: 运行 ESLint 检查并自动修复。test: 运行单元测试。",
     "运行时依赖": " 项目在生产环境中正常运行所必需的库，如 vue、vue-router、pinia、element-plus 等。",
     "开发时依赖": " 仅在开发阶段使用的工具，如 vite（构建工具）、typescript、eslint、vitest（测试框架）等。",
-
-    "package-lock.json":"锁定依赖树，确保项目在不同环境下的一致性",
+    "package-lock.json": "锁定依赖树，确保项目在不同环境下的一致性",
     "精确版本锁": "记录了项目中每一个依赖的确切版本号、下载地址以及完整性校验哈希值（integrity hash）。",
     "解决传递依赖": "依据package.json核心依赖信息、将整棵“依赖树全部固定下来",
     "避免冲突与差异": "团队版本严格一致，避免我机器可以，你的不行维妮塔"
   }
 }
-
