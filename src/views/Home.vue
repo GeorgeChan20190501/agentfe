@@ -580,7 +580,7 @@ export default {
       
       // 是否显示聊天区域
       showChatArea: false,
-
+      sessionId: null,
       // 场景卡片配置
       sceneCards: [
         {
@@ -724,6 +724,7 @@ export default {
       this.showAtPanel = false;
       this.chatHistory = []; // 清空聊天记录
       this.showChatArea = false; // 隐藏聊天区域
+      this.sessionId = null;
       this.$message.success('已创建新对话');
     },
 
@@ -808,10 +809,10 @@ export default {
         this.$message.warning('请输入内容');
         return;
       }
-      
+
       // 显示聊天区域
       this.showChatArea = true;
-      
+
       // 添加用户消息到历史记录
       const userMessage = {
         role: 'user',
@@ -819,7 +820,7 @@ export default {
         timestamp: new Date()
       };
       this.chatHistory.push(userMessage);
-      
+
       // 创建空的AI回复消息并添加到历史记录
       const aiMessageIndex = this.chatHistory.length;
       this.chatHistory.push({
@@ -827,24 +828,28 @@ export default {
         content: '',
         timestamp: new Date()
       });
-      
+
       // 滚动到底部
       this.$nextTick(() => {
         this.scrollToBottom();
       });
-      
+
       this.$message.success('消息已发送，语义识别匹配场景中...');
 
       try {
         // 使用流式输出
-        await sendAiMessageStream(this.userInput, (chunk) => {
-          // 实时更新AI回复内容 - 通过数组索引直接修改
-          this.chatHistory[aiMessageIndex].content += chunk;
-          console.log('[Vue] 更新AI内容:', this.chatHistory[aiMessageIndex].content.substring(0, 50));
-          // 每次更新后滚动到底部
-          this.$nextTick(() => {
-            this.scrollToBottom();
-          });
+        await sendAiMessageStream(this.userInput, this.sessionId, {
+          onSessionId: (newSessionId) => {
+            this.sessionId = newSessionId;
+            console.log('[Vue] 保存sessionId:', newSessionId);
+          },
+          onChunk: (chunk) => {
+            this.chatHistory[aiMessageIndex].content += chunk;
+            console.log('[Vue] 更新AI内容:', this.chatHistory[aiMessageIndex].content.substring(0, 50));
+            this.$nextTick(() => {
+              this.scrollToBottom();
+            });
+          }
         });
       } catch (error) {
         console.error('发送消息失败:', error);
