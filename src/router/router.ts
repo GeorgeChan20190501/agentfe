@@ -31,7 +31,7 @@ const router = createRouter({
 // 全局前置守卫
 router.beforeEach(
     (to: RouteLocationNormalized, _from: RouteLocationNormalized, next: NavigationGuardNext) => {
-        // 设置页面标题
+        // 设置路由到的页面标题
         document.title = (to.meta.title as string) || 'AgentFE'
 
         // 检查是否需要认证

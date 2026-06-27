@@ -1,46 +1,46 @@
-name: CI/CD Pipeline
+name: CI/CD Pipeline #流水线
 
 on:
   push:
     branches: [ main, master ]
   pull_request:
-    branches: [ main, master ]
+    branches: [ main, master ]  #PR合并请求，即模拟合并结果
 
 jobs:
   # 第1阶段：CI（代码检查 + 测试）
   lint-and-test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest  # 让github分配一个此类型虚拟机环境
 
     strategy:
       matrix:
-        node-version: [ 24.x ]
+        node-version: [ 24.x ]  # 安装Node.js版本 ============================================= 1
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - name: Checkout code        # 步骤1.检出代码
+        uses: actions/checkout@v4  # 执行签出
 
-      - name: Setup Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v4
+      - name: Setup Node.js ${{ matrix.node-version }}  # 步骤2.设置Node.js版本
+        uses: actions/setup-node@v4  # 执行设置Node.js版本
         with:
           node-version: ${{ matrix.node-version }}
           cache: 'npm'
 
-      - name: Install dependencies
-        run: npm ci
+      - name: Install dependencies  # 步骤3.安装依赖
+        run: npm ci  # 运行npm ci命令
 
-      - name: Run linter
+      - name: Run linter  # 步骤4.运行代码检查
         run: npm run lint
 
-      - name: Type check
+      - name: Type check  # 步骤5.类型检查
         run: npm run type-check
 
-      - name: Run tests
+      - name: Run tests  # 步骤6.运行测试
         run: npm run test:run
 
-      - name: Build project
+      - name: Build project  # 步骤7.构建项目
         run: npm run build
 
-      - name: Upload build artifacts
+      - name: Upload build artifacts  # 步骤8.上传构建制品
         uses: actions/upload-artifact@v4
         with:
           name: dist
@@ -50,31 +50,31 @@ jobs:
   # 第2阶段：CD（部署服务器）
   deploy:
     needs: lint-and-test
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest  # 让github分配一个此类型虚拟机环境
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'  # 只有在main或master分支上才执行
 
     steps:
-      - name: Download build artifacts
+      - name: Download build artifacts  # 1.下载构建制品
         uses: actions/download-artifact@v4
         with:
           name: dist
           path: dist/
 
-      - name: Deploy to server via SSH
+      - name: Deploy to server via SSH  # 2.通过SSH部署到服务器 ================================= 2
         uses: appleboy/scp-action@master
         with:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USER }}
-          password: ${{ secrets.SERVER_PASSWORD }}
+          password: ${{ secrets.SERVER_PASSWORD }}    #配置服务器账号密码等信息
           source: "dist/*"
-          target: "/www/wwwroot/agentfe"
+          target: "/www/wwwroot/agentfe"              # 上传dist到服务器的目标路径
           strip_components: 1
 
-      - name: Clear Nginx cache
+      - name: Clear Nginx cache                       # 清除Nginx缓存
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USER }}
-          password: ${{ secrets.SERVER_PASSWORD }}
+          password: ${{ secrets.SERVER_PASSWORD }}     # Nginx配置测试并重新加载
           script: |
-            nginx -t && nginx -s reload || true
+            nginx -t && nginx -s reload || true     
